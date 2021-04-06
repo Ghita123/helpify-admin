@@ -20,13 +20,30 @@ import * as EmailValidator from 'email-validator';
 const [email, setEmail] = useState("test@email.com")
 const [motdepasse, setMotdepasse] = useState("")
 const [erreur, setError] = useState({email:"",motdepasse:""})
+const [message, setMessage] = useState(null)
+
+const url = {
+    remote: "https://helpify-back.herokuapp.com/login",
+    local: "http://localhost:8081/login"
+}
 const handleLogin=()=>{
     if (!EmailValidator.validate(email))
     return setError({email:"Email non valide",motdepasse:""});
     
     if (motdepasse.length==0)
     return setError({email:"",motdepasse:"Entrer un mot de passe"});
-    alert("Bienvenue")
+    setMessage(<GiSwordSpin size="30px" className="animate-spin text-purple-600" />)
+
+    axios.get(`${url.remote}?email=${email}&password=${motdepasse}`)
+        .then(res => {
+            console.log(res.data)
+            if (res.data)
+                setTimeout(() => { setMessage(<div className="text-green-500  flex items-center  gap-2"> <GiCheckMark /> Welcome!    </div>) }, 2000)
+
+            else setMessage("Error! try again")
+        })
+        .catch(e => console.error(e))
+
 
 }
 // useEffect(() => {
@@ -85,6 +102,9 @@ const handleLogin=()=>{
             <button type="submit" value="Submit" class="btn btn-success" className="p-3 text-white w-80 font-semibold text-lg   bg-gradient-to-r from-blue-400 to-purple-500  md:w-80  rounded-3xl " onClick={()=>handleLogin()}>
                 Login
               </button>
+              <div>
+                        {message}
+                    </div>
       
 
             <div className="text-sm text-gray-400">

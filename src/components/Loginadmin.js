@@ -1,4 +1,4 @@
-import { Link } from '@reach/router'
+import { Link, navigate } from '@reach/router'
 import React, { useState , useEffect } from 'react'
 import { FaHandsHelping } from "react-icons/fa"
 import { FiUser } from "react-icons/fi"
@@ -17,43 +17,37 @@ import * as EmailValidator from 'email-validator';
  
 
 
-  function Login()
+  function LoginAdmin ()
   {
 const [email, setEmail] = useState("test@email.com")
 const [motdepasse, setMotdepasse] = useState("")
 const [erreur, setError] = useState({email:"",motdepasse:""})
 const [message, setMessage] = useState(null)
-const handleLogin=()=>{
-  const url = {
-    remote: "https://helpify-back.herokuapp.com/loginadmin",
-    local: "http://localhost:8081/loginadmin"
+
+const url = {
+    remote: "https://helpify-back.herokuapp.com/login",
+    local: "http://localhost:8081/login"
 }
-
-if (!EmailValidator.validate(email))
-    return setError({ email: "Email non valide", motdepasse: "" });
-
-if (motdepasse.length == 0)
-    return setError({ email: "", motdepasse: "Entrer un mot de passe" });
-
-setMessage(<GiSwordSpin size="30px" className="animate-spin text-purple-600" />)
-
-
-axios.get(`${url.remote}?email=${email}&password=${motdepasse}`)
-    .then(res => {
-        console.log(res.data)
-        if (res.data)
-            setTimeout(() => { setMessage(<div className="text-green-500  flex items-center  gap-2"> <GiCheckMark /> Welcome!    </div>) }, 2000)
-
-        else setMessage("Error! try again")
-    })
-    .catch(e => console.error(e))
-
+const handleLogin=()=>{
     if (!EmailValidator.validate(email))
     return setError({email:"Email non valide",motdepasse:""});
     
     if (motdepasse.length==0)
     return setError({email:"",motdepasse:"Entrer un mot de passe"});
-    alert("Bienvenue")
+    setMessage(<GiSwordSpin size="30px" className="animate-spin text-gray-200" />)
+
+    axios.get(`${url.remote}?email=${email}&password=${motdepasse}`)
+        .then(res => {
+            console.log(res.data)
+            if (res.data)
+            {
+                setTimeout(() => { setMessage(<div className="text-green-500  flex items-center  gap-2"> <GiCheckMark /> Welcome!    </div>) }, 2000)
+                    navigate("/dashadmin")
+            }
+            else setMessage("Error! try again")
+        })
+        .catch(e => console.error(e))
+
 
 }
 
@@ -121,6 +115,9 @@ axios.get(`${url.remote}?email=${email}&password=${motdepasse}`)
               <button type="submit" value="Submit" class="btn btn-success" className="p-3 text-white w-80 font-semibold text-lg   bg-gradient-to-r from-blue-400 to-purple-500  md:w-80  rounded-3xl " onClick={()=>handleLogin()}>
                 Login
               </button>
+              <div>
+                  {message}
+              </div>
         
 
             
@@ -139,7 +136,7 @@ axios.get(`${url.remote}?email=${email}&password=${motdepasse}`)
   }
 
   
-export default Login;
+export default LoginAdmin;
 
 
 
